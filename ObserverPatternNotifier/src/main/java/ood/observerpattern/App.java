@@ -5,7 +5,7 @@ public class App {
     public static void main(String[] args) {
         Newspaper offlineMedia = new Newspaper();
         Internet onlineMedia = new Internet();
-        Loan personalLoad = new Loan("Personal Loan", 0.75f, "Standard Chartered");
+        Loan personalLoad = new Loan("Personal Loan", "Chase", 0.75f);
         personalLoad.registerObserver(offlineMedia);
         personalLoad.registerObserver(onlineMedia);
         //update interest then send notify
