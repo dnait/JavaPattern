@@ -11,10 +11,10 @@ public class Loan implements Subject {
     private ArrayList<Observer> observerList = new ArrayList<Observer>();
 
     //constructor
-    public Loan (String type, float interest, String bank) {
+    public Loan (String type, String bank, float interest) {
         this.type = type;
-        this.interest = interest;
         this.bank = bank;
+        this.interest = interest;
     }
 
     public float getInterest() {
