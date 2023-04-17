@@ -137,3 +137,104 @@ public class PersonController : ApiController
         return Ok(person);
     }
 }
+
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Web.Http;
+
+public class UserController : ApiController
+{
+    private string connectionString = "<your connection string here>";
+
+    [HttpGet]
+    public IEnumerable<User> GetAllUsers()
+    {
+        List<User> userList = new List<User>();
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+            SqlCommand command = new SqlCommand("SELECT * FROM Users", connection);
+            SqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                User user = new User();
+                user.Id = reader.GetInt32(0);
+                user.Name = reader.GetString(1);
+                user.Email = reader.GetString(2);
+                userList.Add(user);
+            }
+        }
+        return userList;
+    }
+
+    [HttpGet]
+    public IHttpActionResult GetUserById(int id)
+    {
+        User user = new User();
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+            SqlCommand command = new SqlCommand("SELECT * FROM Users WHERE Id = @Id", connection);
+            command.Parameters.AddWithValue("@Id", id);
+            SqlDataReader reader = command.ExecuteReader();
+            while (reader.Read())
+            {
+                user.Id = reader.GetInt32(0);
+                user.Name = reader.GetString(1);
+                user.Email = reader.GetString(2);
+            }
+        }
+        if (user.Id == 0)
+        {
+            return NotFound();
+        }
+        return Ok(user);
+    }
+
+    [HttpPost]
+    public void AddUser([FromBody] User user)
+    {
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+            SqlCommand command = new SqlCommand("INSERT INTO Users (Name, Email) VALUES (@Name, @Email)", connection);
+            command.Parameters.AddWithValue("@Name", user.Name);
+            command.Parameters.AddWithValue("@Email", user.Email);
+            command.ExecuteNonQuery();
+        }
+    }
+
+    [HttpPut]
+    public void UpdateUser(int id, [FromBody] User user)
+    {
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+            SqlCommand command = new SqlCommand("UPDATE Users SET Name = @Name, Email = @Email WHERE Id = @Id", connection);
+            command.Parameters.AddWithValue("@Name", user.Name);
+            command.Parameters.AddWithValue("@Email", user.Email);
+            command.Parameters.AddWithValue("@Id", id);
+            command.ExecuteNonQuery();
+        }
+    }
+
+    [HttpDelete]
+    public void DeleteUser(int id)
+    {
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+            SqlCommand command = new SqlCommand("DELETE FROM Users WHERE Id = @Id", connection);
+            command.Parameters.AddWithValue("@Id", id);
+            command.ExecuteNonQuery();
+        }
+    }
+}
+
+public class User
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public string Email { get; set; }
+}
+
