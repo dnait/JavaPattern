@@ -238,3 +238,4 @@ public class User
     public string Email { get; set; }
 }
 
+https://stackoverflow.com/questions/10880472/how-to-model-a-restful-api-with-inheritance
