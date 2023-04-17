@@ -1,0 +1,77 @@
+example of a RESTful API in C# that uses the PersonRepository class from the previous example to perform CRUD operations on a SQL Server database:
+
+Create a new C# ASP.NET Web API project in Visual Studio.
+
+Add the Newtonsoft.Json NuGet package to the project.
+
+Add a new class to the project called Person.cs with the following code:
+
+csharp
+Copy code
+public class Person
+{
+    public int Id { get; set; }
+    public string FirstName { get; set; }
+    public string LastName { get; set; }
+}
+Add a new class to the project called PersonController.cs with the following code:
+csharp
+Copy code
+using System.Collections.Generic;
+using System.Web.Http;
+using Newtonsoft.Json;
+
+public class PersonController : ApiController
+{
+    private PersonRepository repository = new PersonRepository();
+
+    [HttpGet]
+    public IHttpActionResult Get()
+    {
+        List<Person> people = repository.GetAll();
+        string json = JsonConvert.SerializeObject(people);
+        return Ok(json);
+    }
+
+    [HttpGet]
+    public IHttpActionResult Get(int id)
+    {
+        Person person = repository.GetById(id);
+        if (person == null)
+        {
+            return NotFound();
+        }
+        string json = JsonConvert.SerializeObject(person);
+        return Ok(json);
+    }
+
+    [HttpPost]
+    public IHttpActionResult Post([FromBody] Person person)
+    {
+        int id = repository.Add(person);
+        return Ok(id);
+    }
+
+    [HttpPut]
+    public IHttpActionResult Put(int id, [FromBody] Person person)
+    {
+        repository.Update(id, person);
+        return Ok();
+    }
+
+    [HttpDelete]
+    public IHttpActionResult Delete(int id)
+    {
+        repository.Delete(id);
+        return Ok();
+    }
+}
+Run the project and use a tool like Postman to test the API endpoints:
+GET /api/person: Returns a list of all people in the database.
+GET /api/person/{id}: Returns a specific person by ID.
+POST /api/person: Creates a new person in the database.
+PUT /api/person/{id}: Updates an existing person in the database.
+DELETE /api/person/{id}: Deletes a person from the database by ID.
+
+
+
