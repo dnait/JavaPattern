@@ -238,4 +238,63 @@ public class User
     public string Email { get; set; }
 }
 
+public interface IRepository<T> where T : class {
+    void Add(T entity);
+    void Delete(T entity);
+    void Update(T entity);
+    IEnumerable<T> All();
+}
+
+public class Repository<T> : IRepository<T> where T : class {
+    private readonly DataContext context;
+    private readonly Table<T> table;
+
+    public Repository(DataContext context) {
+        this.context = context;
+        table = context.GetTable<T>();
+    }
+
+    public void Add(T entity) {
+        table.InsertOnSubmit(entity);
+    }
+
+    public void Delete(T entity) {
+        table.DeleteOnSubmit(entity);
+    }
+
+    public void Update(T entity) {
+        context.Refresh(RefreshMode.OverwriteCurrentValues, entity);
+    }
+
+    public IEnumerable<T> All() {
+        return table.AsEnumerable();
+    }
+}
+
+public abstract class DaoFactory {
+    public static DaoFactory GetInstance(DaoConnection daoConnection) {
+        DaoFactory instance = null;
+        switch (daoConnection) {
+            case DaoConnection.Default:
+            case DaoConnection.MySQL:
+                instance = new MySqlConnectionFactory(MySqlServer, MySqlPort, MySqlUser, MySqlPassword);
+                break;
+            case DaoConnection.SqlServer:
+                instance = new SqlServerDaoFactory(SqlServerConnection);
+                break;
+            case DaoConnection.MongoDB:
+                instance = new MongoDBDaoFactory(MongoDBConnection);
+                break;
+            default:
+                throw new ArgumentException("Invalid database connection");
+        }
+        return instance;
+    }
+
+    public abstract IAccountDao GetAccountDao();
+    public abstract ITransactionDao GetTransactionDao();
+}
+
+
 https://stackoverflow.com/questions/10880472/how-to-model-a-restful-api-with-inheritance
+https://stackoverflow.com/questions/54158740/using-inherited-classes-in-net-web-api-post-put-method
