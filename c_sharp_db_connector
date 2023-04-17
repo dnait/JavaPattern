@@ -1,0 +1,32 @@
+using System.Data.SqlClient;
+
+public sealed class SqlServerConnector
+{
+    private static readonly SqlServerConnector instance = new SqlServerConnector();
+    private readonly SqlConnection connection;
+
+    private SqlServerConnector()
+    {
+        string connectionString = "Data Source=myServerAddress;Initial Catalog=myDataBase;User ID=myUsername;Password=myPassword;";
+        connection = new SqlConnection(connectionString);
+    }
+
+    public static SqlServerConnector Instance
+    {
+        get
+        {
+            return instance;
+        }
+    }
+
+    public SqlConnection Connection
+    {
+        get
+        {
+            return connection;
+        }
+    }
+}
+#
+ Instead, it is recommended to store the connection string in a configuration file, 
+ such as app.config or web.config, and retrieve it using the ConfigurationManager.ConnectionStrings property
